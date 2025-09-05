@@ -269,6 +269,15 @@ class Viewer {
         let prevCamera: InputController | null = null;
         let prevCameraMode = 'orbit';
 
+        // track last applied camera angles to report per-frame orbit delta
+        const lastAngles = new Vec3(activePose.angles.x, activePose.angles.y, activePose.angles.z);
+        const wrapDelta = (curr: number, prev: number) => {
+            let d = curr - prev;
+            while (d > 180) d -= 360;
+            while (d < -180) d += 360;
+            return d;
+        };
+
         // handle input events
         events.on('inputEvent', (eventName, event) => {
             const doReset = (pose: Pose) => {
@@ -344,6 +353,27 @@ class Viewer {
             activePose.copy(pose);
             entity.setPosition(activePose.position);
             entity.setEulerAngles(activePose.angles);
+
+            // publish applied orbit deltas (deg) when in orbit mode
+            try {
+                const sse: any = (window as any).sse;
+                if (sse) {
+                    const dx = wrapDelta(activePose.angles.x, lastAngles.x);
+                    const dy = wrapDelta(activePose.angles.y, lastAngles.y);
+                    // Only report when in orbit; otherwise 0
+                    if (state.cameraMode === 'orbit') {
+                        sse.orientationAppliedDeg = sse.orientationAppliedDeg || { x: 0, y: 0 };
+                        sse.orientationAppliedDeg.x = dx;
+                        sse.orientationAppliedDeg.y = dy;
+                    } else if (sse.orientationAppliedDeg) {
+                        sse.orientationAppliedDeg.x = 0;
+                        sse.orientationAppliedDeg.y = 0;
+                    }
+                }
+            } catch (_) { /* noop */ }
+
+            // update last angles for next frame
+            lastAngles.copy(activePose.angles);
 
             // update animation timeline
             if (state.cameraMode === 'anim') {
