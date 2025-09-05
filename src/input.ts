@@ -205,15 +205,38 @@ class AppController {
         // device orientation (gamma -> yaw x, beta -> pitch y)
         try {
             const sse: any = (window as any).sse;
-            if (sse && sse.orientationDelta && (sse.orientationEnabled !== false) && orbit && !pan) {
+            if (sse && sse.orientationDelta && (sse.orientationEnabled !== false)) {
                 const ox = sse.orientationDelta.x || 0;
                 const oy = sse.orientationDelta.y || 0;
-                if (Math.abs(ox) > 0.05 || Math.abs(oy) > 0.05) {
-                    const o = new Vec3(ox, oy, 0);
-                    // sensitivity tuned low to avoid jitter; multiplied by dt like other inputs
-                    v.add(o.mulScalar(this.orbitSpeed * 0.05 * dt));
+
+                // default: nothing applied
+                if (sse.orientationAppliedDeg) {
+                    sse.orientationAppliedDeg.x = 0;
+                    sse.orientationAppliedDeg.y = 0;
                 }
-                // consume
+
+                // detect meaningful orientation input
+                const hasOrientationInput = (Math.abs(ox) > 0.05 || Math.abs(oy) > 0.05);
+
+                // if user starts moving device and we're not in orbit, switch to orbit
+                if (hasOrientationInput && state.cameraMode !== 'orbit' && !pan) {
+                    state.snap = true;
+                    state.cameraMode = 'orbit';
+                }
+
+                if (orbit && !pan && hasOrientationInput) {
+                    // sensitivity gain (multiplied by orbitSpeed and dt)
+                    const gain = this.orbitSpeed * 2.0 * dt;
+                    const o = new Vec3(ox, oy, 0);
+                    v.add(o.mulScalar(gain));
+
+                    if (sse.orientationAppliedDeg) {
+                        sse.orientationAppliedDeg.x = ox * gain;
+                        sse.orientationAppliedDeg.y = oy * gain;
+                    }
+                }
+
+                // consume after use
                 sse.orientationDelta.x = 0;
                 sse.orientationDelta.y = 0;
             }

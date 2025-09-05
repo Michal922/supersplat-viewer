@@ -335,8 +335,8 @@ button:active {
     background-color: #fff8;
 }
 
-/* orientation box */
-#orientationBox {
+/* orientation boxes */
+#orientationBox, #orientationDeltaBox {
     position: fixed;
     top: max(12px, env(safe-area-inset-top));
     left: max(12px, env(safe-area-inset-left));
@@ -350,4 +350,9 @@ button:active {
 }
 #orientationBox.clickable {
     cursor: pointer;
+}
+
+/* place delta box below the main orientation box */
+#orientationDeltaBox {
+    top: calc(max(12px, env(safe-area-inset-top)) + 72px);
 }
