@@ -328,6 +328,32 @@ class Viewer {
             // update input controller
             controller.update(deltaTime, state, activePose.distance);
 
+            // Inject device orientation into the current frame before camera update
+            try {
+                const sse: any = (window as any).sse;
+                if (state.cameraMode !== 'fly' && sse && sse.orientationDelta && (sse.orientationEnabled !== false)) {
+                    const ox = sse.orientationDelta.x || 0;
+                    const oy = sse.orientationDelta.y || 0;
+                    const hasOrientationInput = (Math.abs(ox) > 0.05 || Math.abs(oy) > 0.05);
+
+                    if (hasOrientationInput) {
+                        // switch to orbit on first meaningful orientation input
+                        if (state.cameraMode !== 'orbit') {
+                            state.snap = true;
+                            state.cameraMode = 'orbit';
+                        }
+
+                        // sensitivity gain (multiplied by orbitSpeed and dt)
+                        const gain = controller.orbitSpeed * 2.0 * deltaTime;
+                        controller.frame.deltas.rotate.append([ox * gain, oy * gain, 0]);
+                    }
+
+                    // consume after use
+                    sse.orientationDelta.x = 0;
+                    sse.orientationDelta.y = 0;
+                }
+            } catch (_) { /* noop */ }
+
             // update touch joystick UI
             if (state.cameraMode === 'fly') {
                 events.fire('touchJoystickUpdate', controller.joystick.base, controller.joystick.stick);
