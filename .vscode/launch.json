@@ -7,10 +7,10 @@
         { //For npx serve (adjust port to what serve prints, often 3000):
             "type": "pwa-chrome",
             "request": "launch",
-            "name": "Chrome: my_splat_test (serve)",
-            "url": "http://localhost:3000/index.html",
-            "webRoot": "${workspaceFolder}/my_test_folder"
+            "name": "Chrome: public (serve)",
+            "url": "https://localhost:3000/index.html",
+            "webRoot": "${workspaceFolder}/public"
         }
     ]
 }
-// cd my_test_folder && npx serve; then attach debugger from vscode
+// cd public && npx serve; then attach debugger from vscode

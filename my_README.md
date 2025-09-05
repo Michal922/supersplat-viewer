@@ -91,6 +91,12 @@ serve public -C --ssl-cert ./cert.pem --ssl-key ./key.pem -l 3000
 
 ### FAQ
 
+### where to find some pretrained splat models
+
+Open a PLY file formatted for 3DGS (eg. download the official pre-trained models) or a .splat file (use this script to convert from PLY)
+<https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/datasets/pretrained/models.zip>
+<https://github.com/antimatter15/splat/blob/main/convert.py>
+
 #### npm run develop vs npx serve
 
 ***`npm run develop`***
