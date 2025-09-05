@@ -285,6 +285,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         'orbitSettings', 'flySettings',
         'fly', 'orbit', 'cameraToggleHighlight',
         'high', 'low', 'qualityToggleHighlight',
+        'orientationToggleHighlight', 'orientationOn', 'orientationOff',
         'reset', 'frame',
         'loadingText', 'loadingBar',
         'joystickBase', 'joystick'
@@ -369,6 +370,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateHQ();
     });
     updateHQ();
+
+    // Orientation control toggle
+    const updateOrientationToggle = () => {
+        const enabled = (window as any).sse?.orientationEnabled !== false;
+        dom.orientationToggleHighlight.classList[enabled ? 'add' : 'remove']('right');
+    };
+    dom.orientationOn.addEventListener('click', () => {
+        if ((window as any).sse) (window as any).sse.orientationEnabled = true;
+        updateOrientationToggle();
+    });
+    dom.orientationOff.addEventListener('click', () => {
+        if ((window as any).sse) (window as any).sse.orientationEnabled = false;
+        updateOrientationToggle();
+    });
+    updateOrientationToggle();
 
     // AR/VR
     const arChanged = () => dom.arMode.classList[state.hasAR ? 'remove' : 'add']('hidden');

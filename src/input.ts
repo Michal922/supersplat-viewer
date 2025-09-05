@@ -202,6 +202,24 @@ class AppController {
         v.add(orbitRotate.mulScalar(orbit * (1 - pan) * this.orbitSpeed * dt));
         const flyRotate = new Vec3(rightInput[0], rightInput[1], 0);
         v.add(flyRotate.mulScalar(fly * this.orbitSpeed * orbitFactor * dt));
+        // device orientation (gamma -> yaw x, beta -> pitch y)
+        try {
+            const sse: any = (window as any).sse;
+            if (sse && sse.orientationDelta && (sse.orientationEnabled !== false) && orbit && !pan) {
+                const ox = sse.orientationDelta.x || 0;
+                const oy = sse.orientationDelta.y || 0;
+                if (Math.abs(ox) > 0.05 || Math.abs(oy) > 0.05) {
+                    const o = new Vec3(ox, oy, 0);
+                    // sensitivity tuned low to avoid jitter; multiplied by dt like other inputs
+                    v.add(o.mulScalar(this.orbitSpeed * 0.05 * dt));
+                }
+                // consume
+                sse.orientationDelta.x = 0;
+                sse.orientationDelta.y = 0;
+            }
+        } catch (e) {
+            // no-op if window.sse not defined
+        }
         deltas.rotate.append([v.x, v.y, v.z]);
 
         // gamepad move

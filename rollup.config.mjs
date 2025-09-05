@@ -23,6 +23,9 @@ export default [{
             }, {
                 src: 'src/index.css',
                 dest: 'public'
+            }, {
+                src: 'my_splat_files/**/*',
+                dest: 'public/my_splat_files'
             }]
         })
     ]

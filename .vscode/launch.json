@@ -1,0 +1,16 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        { //For npx serve (adjust port to what serve prints, often 3000):
+            "type": "pwa-chrome",
+            "request": "launch",
+            "name": "Chrome: my_splat_test (serve)",
+            "url": "http://localhost:3000/index.html",
+            "webRoot": "${workspaceFolder}/my_test_folder"
+        }
+    ]
+}
+// cd my_test_folder && npx serve; then attach debugger from vscode

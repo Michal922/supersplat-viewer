@@ -48,7 +48,7 @@
     "globals": "^16.3.0",
     "playcanvas": "^2.10.6",
     "publint": "^0.3.12",
-    "rollup": "^4.46.2",
+    "rollup": "^4.50.0",
     "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-string": "^3.0.0",
     "serve": "^14.2.4",
