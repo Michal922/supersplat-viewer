@@ -152,3 +152,11 @@ The device sensors can by mimic via:
 <https://developer.chrome.com/docs/devtools/sensors#orientation>
 
 `F12` --> `Control+Shift+P` --> Type `sensors`, select Show Sensors, and press Enter. The Sensors panel opens up at the bottom of your DevTools window.
+
+#### local server with custom scene and settings
+
+```.sh
+npm run serve-https
+# then connect browser to
+https://localhost:3000/?content=https://d28zzqy0iyovbz.cloudfront.net/6f58cde2/v1/scene.compressed.ply&settings=./my_settings/Haut_Koenigsbourg.json
+```
