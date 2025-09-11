@@ -1,6 +1,6 @@
 # INSTRUCTIONS
 
-From this folder, start a tiny web server
+From the folder with webpage (for example `public/`), start a tiny web server
 
 **Python:**
 
@@ -71,23 +71,29 @@ Online state: unknown
 
 1. Generate trusted local certificates
 
-```.sh
-mkcert localhost 192.168.0.66 <-------------- your ip
-```
+    ```.sh
+    mkcert localhost 192.168.0.66 <-------------- your ip
+    ```
 
-This creates two files in your current directory:
-localhost+192.168.0.66.pem → certificate
-localhost+192.168.0.66-key.pem → private key
+    This creates two files in your current directory:
+    localhost+192.168.0.66.pem → certificate
+    localhost+192.168.0.66-key.pem → private key
 
-I renamed them to `cert.pem` and `key.pem` for convienience.
+    I renamed them to `cert.pem` and `key.pem` for convienience.
 
-2. Start the HTTPS dev server with `serve`
+2. Start the HTTPS dev server with `serve` (from the main directory)
 
-```.sh
-npm install --save-dev rollup
-npm run build   
-serve public -C --ssl-cert ./cert.pem --ssl-key ./key.pem -l 3000
-```
+    ```.sh
+    npm install --save-dev rollup
+    npm run build   
+    serve public -C --ssl-cert ./cert.pem --ssl-key ./key.pem -l 3000
+    ```
+
+Pro tip: You can add the `"serve-https": "serve public -C --ssl-cert ./cert.pem --ssl-key ./key.pem -l 3000"` to `package.json` then just call `serve-https`
+
+#### demo webpage via github pages
+
+`cp -r public/* docs` as github pages (this repo) are configured to host from the `docs` folder.
 
 ### FAQ
 
@@ -129,4 +135,20 @@ Useful only when you want to serve plain HTML/CSS/JS.
 
 Key difference
 `npm run develop` = project-specific dev command (often with bundling, hot reload, React/Vue/Svelte integration).
+
+  ```
+    It our case, npm run develop starts two processes:
+    Rollup builds your code continuously (watch mode).
+    A local web server serves the public folder (with your viewer).
+    That’s your live development setup: change source → rebuild → reload browser.
+  ```
+
 `npx serve` = generic static file server (just serves files, nothing else).
+
+#### device sensors
+
+The device sensors can by mimic via:
+
+<https://developer.chrome.com/docs/devtools/sensors#orientation>
+
+`F12` --> `Control+Shift+P` --> Type `sensors`, select Show Sensors, and press Enter. The Sensors panel opens up at the bottom of your DevTools window.

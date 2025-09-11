@@ -57,10 +57,12 @@
   "scripts": {
     "build": "rollup -c",
     "develop": "concurrently --kill-others \"npm run watch\" \"npm run serve\"",
+    "develop-https": "concurrently --kill-others \"npm run watch\" \"npm run serve-https\"",
     "lint": "eslint src module rollup.config.mjs eslint.config.mjs",
     "lint:fix": "eslint src module rollup.config.mjs eslint.config.mjs --fix",
     "publint": "publint",
     "serve": "serve public -C",
+    "serve-https": "serve public -C --ssl-cert ./cert.pem --ssl-key ./key.pem -l 3000",
     "test": "echo \"Error: no test specified\" && exit 1",
     "type:check": "tsc --noEmit",
     "watch": "rollup -c -w"

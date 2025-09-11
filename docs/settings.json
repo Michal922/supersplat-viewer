@@ -1,0 +1,26 @@
+{
+    "background": {
+        "color": [
+            0,
+            0,
+            0,
+            0
+        ]
+    },
+    "camera": {
+        "fov": 60.0,
+        "position": [
+            2,
+            1,
+            2
+        ],
+        "target": [
+            0,
+            0,
+            0
+        ],
+        "startAnim": "orbit",
+        "animTrack": ""
+    },
+    "animTracks": []
+}

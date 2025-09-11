@@ -9,17 +9,20 @@
 
 | [User Manual][manual-url] | [API Reference][api-url] | [Blog][blog-url] | [Forum][forum-url] | [Discord][discord-url] | [Reddit][reddit-url] | [Twitter][twitter-url] |
 
-This is the official viewer for https://superspl.at and the SuperSplat Editor HTML export.
+This is a clone of the official viewer for <https://superspl.at> and the SuperSplat Editor HTML export.
+Demo view at <https://ggruszczynski.github.io/supersplat-viewer/>
 
 <img width="1088" alt="Screenshot 2025-04-11 at 13 36 02" src="https://github.com/user-attachments/assets/a5e2a2eb-3064-4d73-beb9-eb9c4708b2b2" />
 
 This webapp compiles to simple, self-contained, static website.
 
 The app supports a few useful URL parameters (though please note these are subject to change):
+
 - `&settings=url` - specify the URL of the `settings.json` file (default is `./settings.json`)
 - `&content=url` - specify the URL of the `scene.compressed.ply` file (default is `./scene.compressed.ply`)
 
 As well as the following:
+
 - `&noui` - hide UI
 - `&noanim` - start with animation paused
 - `&poster=url` - show an image while loading the scene content
@@ -64,12 +67,11 @@ To initialize a local development environment for SuperSplat Viewer, ensure you 
    npm run develop
    ```
 
-4. Open the browser at http://localhost:3000.
+4. Open the browser at <http://localhost:3000>.
 
 ## Settings Schema
 
 The `settings.json` file has the following schema (as defined in typescript, taken from SuperSplat editor):
-
 
 ```typescript
 type AnimTrack = {

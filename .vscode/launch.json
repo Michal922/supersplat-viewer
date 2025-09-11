@@ -10,6 +10,19 @@
             "name": "Chrome: public (serve)",
             "url": "https://localhost:3000/index.html",
             "webRoot": "${workspaceFolder}/public"
+        },
+        {
+            "type": "pwa-chrome",
+            "request": "launch",
+            "name": "Chrome against localhost (HTTPS)",
+            "url": "https://localhost:3000",
+            "webRoot": "${workspaceFolder}/public",
+            "sourceMaps": true,
+            "trace": true,
+            "runtimeArgs": [
+                "--ignore-certificate-errors", // since you're using self-signed cert
+                "--unsafely-treat-insecure-origin-as-secure=https://localhost:3000"
+            ]
         }
     ]
 }

@@ -57,7 +57,8 @@
             contents: fetch(contentUrl),
             params,
             orientationEnabled: true,
-            orientationAppliedDeg: { x: 0, y: 0 }
+            orientationAppliedDeg: { x: 0, y: 0 },
+            orientationDelta: { x: 0, y: 0 },
         };
     </script>
     <script type="module" src="./index.js"></script>
@@ -88,111 +89,111 @@
     <div id="ui">
         <div id="poster"></div>
         <div id="orientationBox">Orientation
-X-axis (β): 0°
-Y-axis (γ): 0°
-Z-axis (α): 0°</div>
+            X-axis (β): 0°
+            Y-axis (γ): 0°
+            Z-axis (α): 0°</div>
         <div id="orientationDeltaBox">Orbit Δ
-X: 0°
-Y: 0°</div>
+            X: 0°
+            Y: 0°</div>
 
         <!-- Loading Indicator -->
         <div id="loadingWrap">
             <div id="loadingText"></div>
             <div id="loadingBar"></div>
-    </div>
+        </div>
 
-    <script>
-        // Device orientation display
-        (function () {
-            const box = document.getElementById('orientationBox');
-            const deltaBox = document.getElementById('orientationDeltaBox');
+        <script>
+            // Device orientation display
+            (function () {
+                const box = document.getElementById('orientationBox');
+                const deltaBox = document.getElementById('orientationDeltaBox');
 
-            const format = (beta = 0, gamma = 0, alpha = 0) =>
-`Orientation
+                const format = (beta = 0, gamma = 0, alpha = 0) =>
+                    `Orientation
 X-axis (β): ${Math.round(beta)}°
 Y-axis (γ): ${Math.round(gamma)}°
 Z-axis (α): ${Math.round(alpha)}°`;
 
-            let last = { beta: 0, gamma: 0, alpha: 0, init: false };
-            window.sse = window.sse || {};
-            window.sse.orientationDelta = { x: 0, y: 0 };
+                let last = { beta: 0, gamma: 0, alpha: 0, init: false };
+                window.sse = window.sse || {};
+                window.sse.orientationDelta = { x: 0, y: 0 };
 
-            const handler = (ev) => {
-                const { beta, gamma, alpha } = ev; // β, γ, α
-                box.textContent = format(beta, gamma, alpha);
+                const handler = (ev) => {
+                    const { beta, gamma, alpha } = ev; // β, γ, α
+                    box.textContent = format(beta, gamma, alpha);
 
-                if (!last.init) {
-                    last = { beta, gamma, alpha, init: true };
-                    return;
-                }
-                // accumulate deltas for consumption by the app controller (gamma → yaw, beta → pitch)
-                let dGamma = gamma - last.gamma;
-                let dBeta = beta - last.beta;
-                last = { beta, gamma, alpha, init: true };
-
-                // basic clamp to reduce jitter
-                const clamp = (v, m) => Math.max(-m, Math.min(m, v));
-                dGamma = clamp(dGamma, 5);
-                dBeta = clamp(dBeta, 5);
-
-                // map based on screen orientation so tilt is consistent
-                let ax = dGamma;
-                let ay = dBeta;
-                const otype = (screen && screen.orientation && screen.orientation.type) || '';
-                if (otype.startsWith('landscape')) {
-                    if (otype === 'landscape-primary') {
-                        const t = ax; ax = ay; ay = -t;
-                    } else if (otype === 'landscape-secondary') {
-                        const t = ax; ax = -ay; ay = t;
+                    if (!last.init) {
+                        last = { beta, gamma, alpha, init: true };
+                        return;
                     }
-                }
+                    // accumulate deltas for consumption by the app controller (gamma → yaw, beta → pitch)
+                    let dGamma = gamma - last.gamma;
+                    let dBeta = beta - last.beta;
+                    last = { beta, gamma, alpha, init: true };
 
-                // accumulate; controller will scale by dt and sensitivity
-                window.sse.orientationDelta.x += ax;
-                window.sse.orientationDelta.y += ay;
-            };
+                    // basic clamp to reduce jitter
+                    const clamp = (v, m) => Math.max(-m, Math.min(m, v));
+                    dGamma = clamp(dGamma, 5);
+                    dBeta = clamp(dBeta, 5);
 
-            const enable = async () => {
-                try {
-                    if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                        const res = await DeviceOrientationEvent.requestPermission();
-                        if (res !== 'granted') {
-                            box.textContent = 'Orientation\nPermission denied';
-                            return;
+                    // map based on screen orientation so tilt is consistent
+                    let ax = dGamma;
+                    let ay = dBeta;
+                    const otype = (screen && screen.orientation && screen.orientation.type) || '';
+                    if (otype.startsWith('landscape')) {
+                        if (otype === 'landscape-primary') {
+                            const t = ax; ax = ay; ay = -t;
+                        } else if (otype === 'landscape-secondary') {
+                            const t = ax; ax = -ay; ay = t;
                         }
                     }
-                    window.addEventListener('deviceorientation', handler, true);
-                    box.classList.remove('clickable');
-                } catch (_) {
-                    // Fallback: try without permission API
-                    window.addEventListener('deviceorientation', handler, true);
-                    box.classList.remove('clickable');
-                }
-            };
 
-            // Auto-enable on platforms without permission API, otherwise hint to tap
-            if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                box.classList.add('clickable');
-                box.title = 'Tap to enable orientation';
-                box.addEventListener('click', enable, { once: true });
-            } else {
-                enable();
-            }
+                    // accumulate; controller will scale by dt and sensitivity
+                    window.sse.orientationDelta.x += ax;
+                    window.sse.orientationDelta.y += ay;
+                };
 
-            // Show applied orbit deltas (deg) updated by the controller
-            const updateApplied = () => {
-                try {
-                    const sse = (window).sse;
-                    if (deltaBox && sse && sse.orientationAppliedDeg) {
-                        const { x = 0, y = 0 } = sse.orientationAppliedDeg;
-                        deltaBox.textContent = `Orbit Δ\nX: ${x.toFixed(1)}°\nY: ${y.toFixed(1)}°`;
+                const enable = async () => {
+                    try {
+                        if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                            const res = await DeviceOrientationEvent.requestPermission();
+                            if (res !== 'granted') {
+                                box.textContent = 'Orientation\nPermission denied';
+                                return;
+                            }
+                        }
+                        window.addEventListener('deviceorientation', handler, true);
+                        box.classList.remove('clickable');
+                    } catch (_) {
+                        // Fallback: try without permission API
+                        window.addEventListener('deviceorientation', handler, true);
+                        box.classList.remove('clickable');
                     }
-                } catch (_) { /* noop */ }
+                };
+
+                // Auto-enable on platforms without permission API, otherwise hint to tap
+                if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    box.classList.add('clickable');
+                    box.title = 'Tap to enable orientation';
+                    box.addEventListener('click', enable, { once: true });
+                } else {
+                    enable();
+                }
+
+                // Show applied orbit deltas (deg) updated by the controller
+                const updateApplied = () => {
+                    try {
+                        const sse = (window).sse;
+                        if (deltaBox && sse && sse.orientationAppliedDeg) {
+                            const { x = 0, y = 0 } = sse.orientationAppliedDeg;
+                            deltaBox.textContent = `Orbit Δ\nX: ${x.toFixed(1)}°\nY: ${y.toFixed(1)}°`;
+                        }
+                    } catch (_) { /* noop */ }
+                    requestAnimationFrame(updateApplied);
+                };
                 requestAnimationFrame(updateApplied);
-            };
-            requestAnimationFrame(updateApplied);
-        })();
-    </script>
+            })();
+        </script>
         <div id="controlsWrap" class="faded-in">
 
             <!-- Timeline Panel -->

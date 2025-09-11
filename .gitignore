@@ -3,3 +3,6 @@ dist
 public
 .DS_Store
 .npmrc
+
+key.pem
+cert.pem
