@@ -14,11 +14,11 @@ This is a clone of the official viewer for <https://superspl.at> and the SuperSp
 Demo views:
 
 - [Toy cat ~2MB](https://ggruszczynski.github.io/supersplat-viewer/>)
-- [Steak in the Colors of Sunset ~5MB](https://ggruszczynski.github.io/supersplat-viewer/?content=https://d28zzqy0iyovbz.cloudfront.net/c6fc1c77/v1/scene.compressed.ply)
-- [Motorbike ~12MB](https://ggruszczynski.github.io/supersplat-viewer/?content=https://d28zzqy0iyovbz.cloudfront.net/b4222f03/v1/scene.compressed.ply)
-- [Flat interior ~22MB](https://ggruszczynski.github.io/supersplat-viewer/?content=https://d28zzqy0iyovbz.cloudfront.net/14da532f/v1/scene.compressed.ply)
+- [Steak in the Colors of Sunset ~5MB](https://ggruszczynski.github.io/supersplat-viewer/?content=https://d28zzqy0iyovbz.cloudfront.net/c6fc1c77/v1/scene.compressed.ply&settings=./my_settings/steak.json)
+- [Motorbike ~12MB](https://ggruszczynski.github.io/supersplat-viewer/?content=https://d28zzqy0iyovbz.cloudfront.net/b4222f03/v1/scene.compressed.ply=./my_settings/motorbike.json)
+- [Flat interior ~22MB](https://ggruszczynski.github.io/supersplat-viewer/?content=https://d28zzqy0iyovbz.cloudfront.net/14da532f/v1/scene.compressed.ply&settings=./my_settings/flat_interior.json)
 - [Haut Koenigsbourg ~70MB](https://ggruszczynski.github.io/supersplat-viewer/?content=https://d28zzqy0iyovbz.cloudfront.net/6f58cde2/v1/scene.compressed.ply&settings=./my_settings/Haut_Koenigsbourg.json)
-- [Church of St John the Baptist - Nash ~168 MB](https://ggruszczynski.github.io/supersplat-viewer/?content=https://d28zzqy0iyovbz.cloudfront.net/abb4c5b2/v1/scene.compressed.ply)
+- [Church of St John the Baptist - Nash ~168 MB](https://ggruszczynski.github.io/supersplat-viewer/?content=https://d28zzqy0iyovbz.cloudfront.net/abb4c5b2/v1/scene.compressed.ply&settings=./my_settings/church_st_john_baptist.json)
 
 <img width="1088" alt="Screenshot 2025-04-11 at 13 36 02" src="https://github.com/user-attachments/assets/a5e2a2eb-3064-4d73-beb9-eb9c4708b2b2" />
 
