@@ -13,7 +13,7 @@ This is a clone of the official viewer for <https://superspl.at> and the SuperSp
 
 Demo views:
 
-- [Toy cat ~2MB](https://ggruszczynski.github.io/supersplat-viewer/>)
+- [Toy cat ~2MB](https://ggruszczynski.github.io/supersplat-viewer/)
 - [Steak in the Colors of Sunset ~5MB](https://ggruszczynski.github.io/supersplat-viewer/?content=https://d28zzqy0iyovbz.cloudfront.net/c6fc1c77/v1/scene.compressed.ply&settings=./my_settings/steak.json)
 - [Motorbike ~12MB](https://ggruszczynski.github.io/supersplat-viewer/?content=https://d28zzqy0iyovbz.cloudfront.net/b4222f03/v1/scene.compressed.ply&settings=./my_settings/motorbike.json)
 - [Flat interior ~22MB](https://ggruszczynski.github.io/supersplat-viewer/?content=https://d28zzqy0iyovbz.cloudfront.net/14da532f/v1/scene.compressed.ply&settings=./my_settings/flat_interior.json)
