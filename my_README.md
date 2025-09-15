@@ -159,4 +159,5 @@ The device sensors can by mimic via:
 npm run serve-https
 # then connect browser to
 https://localhost:3000/?content=https://d28zzqy0iyovbz.cloudfront.net/6f58cde2/v1/scene.compressed.ply&settings=./my_settings/Haut_Koenigsbourg.json
+
 ```
