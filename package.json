@@ -4,38 +4,16 @@
   "author": "PlayCanvas <support@playcanvas.com>",
   "homepage": "https://github.com/playcanvas/supersplat-viewer#readme",
   "description": "Viewer for https://superspl.at",
-  "keywords": [
-    "playcanvas",
-    "ply",
-    "gaussian",
-    "splat",
-    "viewer"
-  ],
+  "keywords": ["playcanvas", "ply", "gaussian", "splat", "viewer"],
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/playcanvas/supersplat-viewer.git"
-  },
-  "bugs": {
-    "url": "https://github.com/playcanvas/supersplat-viewer/issues"
-  },
-  "files": [
-    "dist",
-    "public",
-    "LICENSE",
-    "package.json",
-    "README.md"
-  ],
+  "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
+  "repository": { "type": "git", "url": "git+https://github.com/playcanvas/supersplat-viewer.git" },
+  "bugs": { "url": "https://github.com/playcanvas/supersplat-viewer/issues" },
+  "files": ["dist", "public", "LICENSE", "package.json", "README.md"],
   "devDependencies": {
     "@playcanvas/eslint-config": "^2.1.0",
     "@playcanvas/web-components": "^0.2.7",
@@ -48,26 +26,33 @@
     "globals": "^16.3.0",
     "playcanvas": "^2.10.6",
     "publint": "^0.3.12",
-    "rollup": "^4.50.0",
+    "rollup": "^4.52.5",
     "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-string": "^3.0.0",
     "serve": "^14.2.4",
     "typescript": "^5.9.2"
   },
+  "dependencies": {},
   "scripts": {
     "build": "rollup -c",
+    "watch": "rollup -c -w",
+
+    "serve": "serve public -C -l 3000",                           
+    "serve-https": "serve public -C --ssl-cert ./certs/server.pem --ssl-key ./certs/server.key -l 3443",
+    "serve-dual": "node scripts/serve-dual.js",                    
+
     "develop": "concurrently --kill-others \"npm run watch\" \"npm run serve\"",
     "develop-https": "concurrently --kill-others \"npm run watch\" \"npm run serve-https\"",
+    "develop-dual": "concurrently --kill-others \"npm run watch\" \"npm run serve-dual\"",
+
     "lint": "eslint src module rollup.config.mjs eslint.config.mjs",
     "lint:fix": "eslint src module rollup.config.mjs eslint.config.mjs --fix",
     "publint": "publint",
-    "serve": "serve public -C",
-    "serve-https": "serve public -C --ssl-cert ./cert.pem --ssl-key ./key.pem -l 3000",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "type:check": "tsc --noEmit",
-    "watch": "rollup -c -w"
+
+    "gen-cert": "bash ./scripts/gen-cert-openssl.sh",
+
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "engines": {
-    "node": ">=18.0.0"
-  }
+  "engines": { "node": ">=18.0.0" }
 }

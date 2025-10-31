@@ -1,8 +1,17 @@
+# katalogi build/cache
 node_modules
 dist
-public
 .DS_Store
 .npmrc
 
+# artefakty dev serwera / logi
+public/*.map
+public/*.log
+
+# certy (lokalne, nie wrzucamy do repo)
+certs/
+public/rootCA.cer
+
+# stare jednoplikowe certy (gdyby kiedyś istniały)
 key.pem
 cert.pem
