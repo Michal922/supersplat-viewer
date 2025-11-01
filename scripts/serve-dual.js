@@ -1,75 +1,129 @@
 // scripts/serve-dual.js
+// Dependency-free dual server launcher using `npx serve` for both HTTP and HTTPS.
+// Works even if `express`/`morgan` are not installed.
+//
+// Usage: `node scripts/serve-dual.js`
+// Requires: the `serve` CLI (automatically resolved by `npx`)
+
 import { spawn } from "node:child_process";
+import os from "node:os";
 import path from "node:path";
 import fs from "node:fs";
-import https from "node:https";
-import express from "express";
-import morgan from "morgan";
 
 const ROOT = process.cwd();
 const PUBLIC_DIR = path.join(ROOT, "public");
 const CERT_DIR = path.join(ROOT, "certs");
-const SERVER_CERT = path.join(CERT_DIR, "server.pem");
-const SERVER_KEY = path.join(CERT_DIR, "server.key");
 
-const HTTP_PORT = Number(process.env.HTTP_PORT || 3000);   // stary workflow
-const HTTPS_PORT = Number(process.env.HTTPS_PORT || 3443); // iOS (sensors)
+const HTTP_PORT = Number(process.env.HTTP_PORT || 3000);
+const HTTPS_PORT = Number(process.env.HTTPS_PORT || 3443);
 
-function ensureCerts() {
-  const ok = fs.existsSync(SERVER_CERT) && fs.existsSync(SERVER_KEY);
-  if (!ok) {
-    console.error("\nBrak certów. Uruchom najpierw: npm run gen-cert -- <IP>\n");
+// Resolve LAN IP (best-effort)
+function getLanIP() {
+  const ifaces = os.networkInterfaces();
+  for (const name of Object.keys(ifaces)) {
+    for (const iface of ifaces[name] || []) {
+      if (!iface.internal && iface.family === "IPv4") {
+        return iface.address;
+      }
+    }
+  }
+  return "127.0.0.1";
+}
+
+function ensurePublic() {
+  if (!fs.existsSync(PUBLIC_DIR)) {
+    console.error(`✖ Missing ${PUBLIC_DIR}. Build first: "npm run build"`);
     process.exit(1);
   }
 }
 
-function startHTTP() {
-  // identycznie jak u kolegi: `serve public -C -l 3000`
-  const ps = spawn(
-    process.platform === "win32" ? "npx.cmd" : "npx",
-    ["serve", "public", "-C", "-l", String(HTTP_PORT)],
-    { stdio: "inherit" }
-  );
-  ps.on("exit", (code) => process.exit(code ?? 0));
+function runServeHTTP() {
+  const args = ["serve", PUBLIC_DIR, "-C", "-l", String(HTTP_PORT)];
+  const child = spawn("npx", args, { stdio: "inherit", shell: true });
+  child.on("exit", (code) => {
+    if (code !== 0) {
+      console.error(`HTTP server exited with code ${code}`);
+    }
+    process.exit(code ?? 0);
+  });
+  return child;
 }
 
-function startHTTPS() {
-  ensureCerts();
+function runServeHTTPS() {
+  const certPath = path.join(CERT_DIR, "server.pem");
+  const keyPath = path.join(CERT_DIR, "server.key");
+  if (!fs.existsSync(certPath) || !fs.existsSync(keyPath)) {
+    console.error("✖ Brak certyfikatów. Uruchom najpierw:");
+    console.error("  npm run gen-cert -- <TWOJE_IP_W_LAN>");
+    process.exit(1);
+  }
 
-  const app = express();
-
-  // Ładne logi requestów (statusy, czasy)
-  app.use(morgan("dev"));
-
-  // /setup – prosta strona z instrukcją i linkiem do CA
-  app.get("/setup", (_, res) => {
-    res.sendFile(path.join(PUBLIC_DIR, "setup", "index.html"));
+  const args = [
+    "serve",
+    PUBLIC_DIR,
+    "-C",
+    "--ssl-cert",
+    certPath,
+    "--ssl-key",
+    keyPath,
+    "-l",
+    String(HTTPS_PORT),
+  ];
+  const child = spawn("npx", args, { stdio: "inherit", shell: true });
+  child.on("exit", (code) => {
+    if (code !== 0) {
+      console.error(`HTTPS server exited with code ${code}`);
+    }
+    process.exit(code ?? 0);
   });
+  return child;
+}
 
-  // Statyki (viewer + wszystko inne)
-  app.use(express.static(PUBLIC_DIR));
+function printBanner() {
+  const LAN_IP = getLanIP();
+  // ensure /setup exists (helpful copy)
+  const setupDir = path.join(PUBLIC_DIR, "setup");
+  if (!fs.existsSync(setupDir)) fs.mkdirSync(setupDir, { recursive: true });
 
-  const opts = {
-    cert: fs.readFileSync(SERVER_CERT),
-    key: fs.readFileSync(SERVER_KEY)
+  const banner = `
+┌──────────────────────────────────────────────┐
+│              DUAL SERVER RUNNING             │
+├──────────────────────────────────────────────┤
+│  HTTP   (desktop/Android):                   │
+│    • http://localhost:${HTTP_PORT}                         │
+│    • http://${LAN_IP}:${HTTP_PORT}                        │
+│                                              │
+│  HTTPS (iPhone sensors):                     │
+│    • https://${LAN_IP}:${HTTPS_PORT}                     │
+│  Setup (CA):                                  │
+│    • https://${LAN_IP}:${HTTPS_PORT}/setup               │
+├──────────────────────────────────────────────┤
+│ Hints:                                       │
+│  - If HTTPS fails on iPhone:                 │
+│      1) open /setup, install rootCA.cer      │
+│      2) Settings → General → About →         │
+│         Certificate Trust Settings → enable  │
+│         full trust for the CA                │
+│  - Re-run gen-cert when your LAN IP changes  │
+└──────────────────────────────────────────────┘
+`;
+  console.log(banner);
+}
+
+function main() {
+  ensurePublic();
+  printBanner();
+  const http = runServeHTTP();
+  const https = runServeHTTPS();
+
+  // Keep process alive while children run
+  const shutdown = () => {
+    http && http.kill("SIGTERM");
+    https && https.kill("SIGTERM");
+    process.exit(0);
   };
-
-  https.createServer(opts, app).listen(HTTPS_PORT, () => {
-    // Konkretny, czytelny banner
-    console.log(`
-  ┌──────────────────────────────────────────────┐
-  │              DUAL SERVER RUNNING             │
-  ├──────────────────────────────────────────────┤
-  │  HTTP   (desktop/Android): http://localhost:${HTTP_PORT}     │
-  │                          http://<LAN_IP>:${HTTP_PORT}  │
-  │                                              │
-  │  HTTPS (iPhone sensors): https://<LAN_IP>:${HTTPS_PORT} │
-  │  Setup (CA):           https://<LAN_IP>:${HTTPS_PORT}/setup │
-  └──────────────────────────────────────────────┘
-`);
-  });
+  process.on("SIGINT", shutdown);
+  process.on("SIGTERM", shutdown);
 }
 
-// uruchamiamy oba na raz
-startHTTP();
-startHTTPS();
+main();
