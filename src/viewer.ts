@@ -331,21 +331,31 @@ class Viewer {
             // Inject device orientation into the current frame before camera update
             try {
                 const sse: any = (window as any).sse;
-                if (state.cameraMode !== 'fly' && sse && sse.orientationDelta && (sse.orientationEnabled !== false)) {
+                // [FLY-ORIENTATION] – włącz orientację także dla trybu 'fly'
+                if (sse && sse.orientationDelta && (sse.orientationEnabled !== false)) {
                     const ox = sse.orientationDelta.x || 0;
                     const oy = sse.orientationDelta.y || 0;
                     const hasOrientationInput = (Math.abs(ox) > 0.05 || Math.abs(oy) > 0.05);
 
                     if (hasOrientationInput) {
-                        // switch to orbit on first meaningful orientation input
-                        if (state.cameraMode !== 'orbit') {
+                        // [FLY-ORIENTATION] – nie przełączaj na Orbit, gdy użytkownik jest w Fly;
+                        // przełączamy tylko z animacji, jak wcześniej.
+                        if (state.cameraMode === 'anim') {
                             state.snap = true;
                             state.cameraMode = 'orbit';
                         }
 
-                        // sensitivity gain (multiplied by orbitSpeed and dt)
-                        const userGain = Math.max(0, state.orientationGain ?? 1.0); // [SLIDER]
-                        const gain = controller.orbitSpeed * 2.0 * deltaTime * userGain; // [SLIDER]
+                        // sensitivity gain (multiplied by speed and dt)
+                        const userGain = Math.max(0, state.orientationGain ?? 1.0); // slider
+                        // [FLY-ORIENTATION] – dobierz bazową szybkość: preferuj lookSpeed jeśli istnieje
+                        const baseSpeed =
+                            (controller as any).lookSpeed ??
+                            (controller as any).orbitSpeed ??
+                            1.0;
+
+                        const gain = baseSpeed * 2.0 * deltaTime * userGain;
+
+                        // W obu trybach (Orbit / Fly) rotacja kamery pochodzi z tych samych delt.
                         controller.frame.deltas.rotate.append([ox * gain, oy * gain, 0]);
                     }
 
