@@ -241,7 +241,6 @@ Z-axis (α): ${Math.round(alpha)}°`;
                     </svg>
                 </button>
                 <button id="orbitSettings" class="button">
-                    <!-- <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h480q33 0 56.5 23.5T720-720v180l160-160v440L720-420v180q0 33-23.5 56.5T640-160H160Zm0-80h480v-480H160v480Zm0 0v-480 480Z"/></svg> -->
                     <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="2 2 20 20" width="24"
                         fill="currentColor">
                         <path
@@ -299,6 +298,15 @@ Z-axis (α): ${Math.round(alpha)}°`;
                 <button id="orientationOff" class="left">Off</button>
                 <button id="orientationOn" class="right">On</button>
             </div>
+
+            <!-- [SLIDER] Orientation Sensitivity -->
+            <div>Orientation Sensitivity</div>
+            <div class="settingsRow">
+                <input id="orientationSensitivity" type="range" min="0" max="200" step="1" value="100" />
+                <div style="min-width:48px;text-align:right"><span id="orientationSensitivityValue">100</span>%</div>
+            </div>
+            <!-- [SLIDER] END -->
+
             <div>View</div>
             <div class="settingsRow">
                 <button id="frame" class="button">Frame</button>

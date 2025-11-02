@@ -228,8 +228,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         hasAR: app.xr.isAvailable('immersive-ar'),
         hasVR: app.xr.isAvailable('immersive-vr'),
         isFullscreen: false,
-        uiVisible: true
+        uiVisible: true,
+        orientationGain: 1.0        // [SLIDER] 1.0 == 100%
     });
+
 
     // Initialize the load-time poster
     if (window.sse?.poster) {
@@ -288,7 +290,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         'orientationToggleHighlight', 'orientationOn', 'orientationOff',
         'reset', 'frame',
         'loadingText', 'loadingBar',
-        'joystickBase', 'joystick'
+        'joystickBase', 'joystick',
+        'orientationSensitivity', 'orientationSensitivityValue' // [SLIDER]
     ].reduce((acc: Record<string, HTMLElement>, id) => {
         acc[id] = document.getElementById(id);
         return acc;
@@ -385,6 +388,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateOrientationToggle();
     });
     updateOrientationToggle();
+
+    // [SLIDER] Orientation sensitivity wiring
+    const updateOrientationSensitivity = () => {
+        const percent = Math.round(state.orientationGain * 100);
+        dom.orientationSensitivityValue.textContent = String(percent);
+        const input = dom.orientationSensitivity as unknown as HTMLInputElement;
+        if (input && String(input.value) !== String(percent)) {
+            input.value = String(percent);
+        }
+    };
+
+    const sensitivityInput = dom.orientationSensitivity as unknown as HTMLInputElement;
+    if (sensitivityInput) {
+        sensitivityInput.addEventListener('input', () => {
+            const v = Number(sensitivityInput.value);
+            // clamp just in case
+            const pct = Math.max(0, Math.min(200, isFinite(v) ? v : 100));
+            state.orientationGain = pct / 100;
+            updateOrientationSensitivity();
+        });
+        // init value on load
+        updateOrientationSensitivity();
+    }
+
+    events.on('orientationGain:changed', updateOrientationSensitivity);
+
 
     // AR/VR
     const arChanged = () => dom.arMode.classList[state.hasAR ? 'remove' : 'add']('hidden');

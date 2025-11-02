@@ -344,7 +344,8 @@ class Viewer {
                         }
 
                         // sensitivity gain (multiplied by orbitSpeed and dt)
-                        const gain = controller.orbitSpeed * 2.0 * deltaTime;
+                        const userGain = Math.max(0, state.orientationGain ?? 1.0); // [SLIDER]
+                        const gain = controller.orbitSpeed * 2.0 * deltaTime * userGain; // [SLIDER]
                         controller.frame.deltas.rotate.append([ox * gain, oy * gain, 0]);
                     }
 
