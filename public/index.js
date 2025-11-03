@@ -93750,7 +93750,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         'settings', 'settingsPanel',
         'orbitSettings', 'flySettings',
         'fly', 'orbit', 'cameraToggleHighlight',
-        'high', 'low', 'qualityToggleHighlight',
+        'high', 'low', 'verylow', 'qualityToggleHighlight',
         'orientationToggleHighlight', 'orientationOn', 'orientationOff',
         'reset', 'frame',
         'loadingText', 'loadingBar',
@@ -93816,19 +93816,53 @@ document.addEventListener('DOMContentLoaded', async () => {
         dom.enterFullscreen.classList[value ? 'add' : 'remove']('hidden');
         dom.exitFullscreen.classList[value ? 'remove' : 'add']('hidden');
     });
-    // HQ mode
+    // Render Quality (Very Low / Low / High)
     dom.high.addEventListener('click', () => {
-        state.hqMode = true;
+        state.hqMode = true; // High
     });
     dom.low.addEventListener('click', () => {
-        state.hqMode = false;
+        state.hqMode = false; // Low
     });
-    const updateHQ = () => {
-        dom.qualityToggleHighlight.classList[state.hqMode ? 'add' : 'remove']('right');
+    dom.verylow.addEventListener('click', () => {
+        // specjalna wartość dla Very Low
+        state.hqMode = 'verylow';
+        events.fire('hqMode:changed', 'verylow'); // wymuś event dla obserwatorów
+    });
+    const applyPixelRatio = (mode) => {
+        if (mode === true) {
+            // High — pełne DPI urządzenia (Retina itp.)
+            graphicsDevice.maxPixelRatio = window.devicePixelRatio;
+        }
+        else if (mode === 'verylow') {
+            // Very Low — połowa rozdzielczości
+            graphicsDevice.maxPixelRatio = 0.5;
+        }
+        else {
+            // Low — 1:1
+            graphicsDevice.maxPixelRatio = 1;
+        }
+        app.renderNextFrame = true;
     };
+    const updateHQ = () => {
+        // przesuń highlight w zależności od trybu
+        dom.qualityToggleHighlight.classList.remove('pos0', 'pos1', 'pos2');
+        if (state.hqMode === true) {
+            dom.qualityToggleHighlight.classList.add('pos2'); // High
+        }
+        else if (state.hqMode === 'verylow') {
+            dom.qualityToggleHighlight.classList.add('pos0'); // Very Low
+        }
+        else {
+            dom.qualityToggleHighlight.classList.add('pos1'); // Low
+        }
+    };
+    // Reakcja na zmianę trybu jakości
     events.on('hqMode:changed', (value) => {
+        applyPixelRatio(value);
         updateHQ();
     });
+    // Inicjalizacja na starcie
+    applyPixelRatio(state.hqMode);
     updateHQ();
     // Orientation control toggle
     const updateOrientationToggle = () => {

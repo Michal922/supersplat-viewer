@@ -356,3 +356,22 @@ button:active {
 #orientationDeltaBox {
     top: calc(max(12px, env(safe-area-inset-top)) + 72px);
 }
+
+
+
+/* --- Render Quality: 3-segment toggle --- */
+#qualityToggle {
+    width: 180px; /* 3 segmenty po 60px */
+}
+#qualityToggle .toggleHighlight {
+    width: 60px;  /* szerokość jednego segmentu */
+}
+/* pozycje highlighta: Very Low / Low / High */
+#qualityToggle .toggleHighlight.pos0 { left: 0; }
+#qualityToggle .toggleHighlight.pos1 { left: 60px; }
+#qualityToggle .toggleHighlight.pos2 { left: 120px; }
+
+/* środkowy przycisk (Low) */
+.toggleWrap > button.middle {
+    left: 60px;
+}
