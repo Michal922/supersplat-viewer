@@ -158,3 +158,27 @@ serve-dual → HTTP (3000) + HTTPS (3443) naraz
   `http://localhost:3000/?content=...&settings=...`
 - iPhone (po zaufaniu CA):  
   `https://<Twoje_IP>:3443/?content=...&settings=...`
+
+
+## 🔹 Eksport do pojedynczego pliku offline
+
+Dodano funkcję tworzenia jednego, samodzielnego pliku **offline/viewer_offline.html**, zawierającego cały viewer 3D, wszystkie skrypty i style oraz osadzony 3D Gaussian Splat (jako Base64).  
+Plik działa w 100% offline, bez serwera, VPN ani połączenia z siecią.
+
+Plik generowany jest komendą:
+
+```sh
+npm run export
+
+wykonuje:
+	1.	Build projektu (Rollup → public/index.js, public/index.html).
+	2.	Zbieranie wszystkich zasobów:
+	  •	kod JavaScript,
+	  •	logika viewer’a,
+	  •	shader’y PlayCanvas/gsplat,
+	  •	CSS,
+	  •	osadzony 3D Gaussian Splat (zakodowany jako Base64),
+	  •	ustawienia sceny i domyślna pozycja kamery.
+	3.	Wszystkie te elementy są wstrzykiwane inline do jednego pliku.
+```
+Jest to kompletny, autonomiczny viewer — po otwarciu natychmiast uruchamia rendering i interakcję z osadzonym splatem.

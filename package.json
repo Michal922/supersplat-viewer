@@ -68,6 +68,7 @@
     "publint": "publint",
     "type:check": "tsc --noEmit",
     "gen-cert": "bash ./scripts/gen-cert-openssl.sh",
+    "export": "npm run build && node scripts/export-offline.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engines": {
